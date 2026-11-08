@@ -1,0 +1,20 @@
+name: Build TACL Twenty frontend
+on:
+  push:
+    branches: [codex/workspace-switch-v222]
+permissions:
+  contents: read
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the frontend with the release toolchain
+        run: |
+          docker build --target twenty-front-build -t tacl-twenty-front -f packages/twenty-docker/twenty/Dockerfile .
+          docker run --rm tacl-twenty-front tar -cz -C /app/packages/twenty-front/build . > frontend.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: twenty-frontend
+          path: frontend.tar.gz
+          retention-days: 2
