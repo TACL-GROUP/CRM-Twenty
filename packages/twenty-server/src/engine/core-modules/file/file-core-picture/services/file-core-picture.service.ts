@@ -10,6 +10,7 @@ import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
 import { Like, type QueryRunner, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
+import { CoreEntityCacheService } from 'src/engine/core-entity-cache/services/core-entity-cache.service';
 import {
   ApplicationException,
   ApplicationExceptionCode,
@@ -36,6 +37,7 @@ export class FileCorePictureService {
   private readonly logger = new Logger(FileCorePictureService.name);
 
   constructor(
+    private readonly coreEntityCacheService: CoreEntityCacheService,
     private readonly fileStorageService: FileStorageService,
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
@@ -123,6 +125,8 @@ export class FileCorePictureService {
     await this.workspaceRepository.update(workspace.id, {
       logoFileId: savedFile.id,
     });
+
+    await this.coreEntityCacheService.invalidate('workspaceEntity', workspace.id);
 
     if (isDefined(workspace.logoFileId)) {
       await this.deleteCorePicture({
@@ -212,12 +216,16 @@ export class FileCorePictureService {
     fileId: string;
     workspaceId: string;
   }): Promise<void> {
-    const file = await this.fileRepository.findOneOrFail(workspaceId, {
+    const file = await this.fileRepository.findOne(workspaceId, {
       where: {
         id: fileId,
         path: Like(`${FileFolder.CorePicture}/%`),
       },
     });
+
+    if (!isDefined(file)) {
+      return;
+    }
 
     const customApplicationUniversalIdentifier =
       await this.findCustomApplicationUniversalIdentifier(workspaceId);
