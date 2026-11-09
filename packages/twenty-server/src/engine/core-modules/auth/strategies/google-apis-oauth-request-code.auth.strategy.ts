@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { type VerifyCallback } from 'passport-google-oauth20';
 
+import { getGoogleApisOauthScopes } from 'src/engine/core-modules/auth/utils/get-google-apis-oauth-scopes';
 import { GoogleAPIsOauthCommonStrategy } from 'src/engine/core-modules/auth/strategies/google-apis-oauth-common.auth.strategy';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 
@@ -12,7 +13,7 @@ export type GoogleAPIScopeConfig = {
 
 @Injectable()
 export class GoogleAPIsOauthRequestCodeStrategy extends GoogleAPIsOauthCommonStrategy {
-  constructor(twentyConfigService: TwentyConfigService) {
+  constructor(private readonly twentyConfigService: TwentyConfigService) {
     super(twentyConfigService);
   }
 
@@ -20,6 +21,11 @@ export class GoogleAPIsOauthRequestCodeStrategy extends GoogleAPIsOauthCommonStr
   authenticate(req: any, options: any) {
     options = {
       ...options,
+      scope: getGoogleApisOauthScopes(
+        Boolean(req.params.workspaceId) &&
+        req.params.workspaceId === this.twentyConfigService.get('GOOGLE_SHARED_CALENDAR_WORKSPACE_ID') &&
+        !this.twentyConfigService.get('MESSAGING_PROVIDER_GMAIL_ENABLED'),
+      ),
       accessType: 'offline',
       prompt: 'consent',
       loginHint: req.params.loginHint,

@@ -31,6 +31,10 @@ export class GoogleCalendarGetEventsService {
       auth: oAuth2Client,
     });
 
+    const calendarId = await this.googleOAuth2ClientProvider.getImportCalendarId(
+      connectedAccount.id,
+    );
+
     let nextSyncToken: string | null | undefined;
     let nextPageToken: string | undefined;
     const calendarEventIds: string[] = [];
@@ -41,7 +45,7 @@ export class GoogleCalendarGetEventsService {
     while (hasMoreEvents) {
       const googleCalendarEvents = await googleCalendarClient.events
         .list({
-          calendarId: 'primary',
+          calendarId,
           maxResults: 500,
           singleEvents: true,
           syncToken: syncCursor,

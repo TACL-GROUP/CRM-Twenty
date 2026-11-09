@@ -137,6 +137,27 @@ export class ConfigVariables {
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.GOOGLE_AUTH,
+    description: 'Workspace ID for the shared Google Calendar import',
+    type: ConfigVariableType.STRING,
+  })
+  GOOGLE_SHARED_CALENDAR_WORKSPACE_ID: string;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.GOOGLE_AUTH,
+    description: 'Google account email authorized to import the shared calendar',
+    type: ConfigVariableType.STRING,
+  })
+  GOOGLE_SHARED_CALENDAR_ACCOUNT: string;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.GOOGLE_AUTH,
+    description: 'Google calendar ID to import for this workspace and account',
+    type: ConfigVariableType.STRING,
+  })
+  GOOGLE_SHARED_CALENDAR_ID: string;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.GOOGLE_AUTH,
     description: 'Callback URL for Google Auth APIs',
     type: ConfigVariableType.STRING,
     isSensitive: false,

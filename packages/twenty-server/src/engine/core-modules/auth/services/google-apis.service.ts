@@ -111,6 +111,8 @@ export class GoogleAPIsService {
     const { scopes, isValid } =
       await this.googleAPIScopesService.getScopesFromGoogleAccessTokenAndCheckIfExpectedScopesArePresent(
         input.accessToken,
+        workspaceId === this.twentyConfigService.get('GOOGLE_SHARED_CALENDAR_WORKSPACE_ID') &&
+          !isMessagingEnabled,
       );
 
     if (!isValid) {
