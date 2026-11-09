@@ -1,7 +1,11 @@
 /** email, profile and openid permission can be called without the https://www.googleapis.com/auth/ prefix
  * see https://developers.google.com/identity/protocols/oauth2/scopes
  */
-export const getGoogleApisOauthScopes = () => {
+export const getGoogleApisOauthScopes = (calendarReadOnly = false) => {
+  if (calendarReadOnly) {
+    return ['email', 'profile', 'https://www.googleapis.com/auth/calendar.events.readonly'];
+  }
+
   return [
     'email',
     'profile',
