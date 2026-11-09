@@ -34,7 +34,7 @@ export class GoogleWebhookSubscriptionDriver implements WebhookSubscriptionDrive
   ): Promise<WebhookSubscriptionResult> {
     return channelType === WebhookSubscriptionChannelType.MESSAGING
       ? this.watchGmailMailbox(connectedAccountId)
-      : this.watchPrimaryCalendar(connectedAccountId, clientState);
+      : this.watchCalendar(connectedAccountId, clientState);
   }
 
   async renewSubscription(
@@ -102,7 +102,7 @@ export class GoogleWebhookSubscriptionDriver implements WebhookSubscriptionDrive
     await gmailClient.users.stop({ userId: 'me' });
   }
 
-  private async watchPrimaryCalendar(
+  private async watchCalendar(
     connectedAccountId: string,
     clientState: string,
   ): Promise<WebhookSubscriptionResult> {
@@ -112,7 +112,9 @@ export class GoogleWebhookSubscriptionDriver implements WebhookSubscriptionDrive
     const watchChannelId = v4();
 
     const { data } = await calendarClient.events.watch({
-      calendarId: 'primary',
+      calendarId: await this.googleOAuth2ClientProvider.getImportCalendarId(
+        connectedAccountId,
+      ),
       requestBody: {
         id: watchChannelId,
         type: 'web_hook',

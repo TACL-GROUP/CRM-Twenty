@@ -26,6 +26,25 @@ export class GoogleOAuth2ClientProvider {
     private readonly connectedAccountRepository: Repository<ConnectedAccountEntity>,
   ) {}
 
+  public async getImportCalendarId(connectedAccountId: string): Promise<string> {
+    const calendarId = this.twentyConfigService.get('GOOGLE_SHARED_CALENDAR_ID');
+    const workspaceId = this.twentyConfigService.get('GOOGLE_SHARED_CALENDAR_WORKSPACE_ID');
+    const handle = this.twentyConfigService.get('GOOGLE_SHARED_CALENDAR_ACCOUNT');
+
+    if (!calendarId || !workspaceId || !handle) {
+      return 'primary';
+    }
+
+    const matches = await this.connectedAccountRepository.existsBy({
+      id: connectedAccountId,
+      workspaceId,
+      handle,
+      provider: ConnectedAccountProvider.GOOGLE,
+    });
+
+    return matches ? calendarId : 'primary';
+  }
+
   public async getClient(
     connectedAccountId: string,
   ): Promise<Auth.OAuth2Client> {

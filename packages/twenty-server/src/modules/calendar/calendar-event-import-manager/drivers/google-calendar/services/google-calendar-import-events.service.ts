@@ -25,6 +25,10 @@ export class GoogleCalendarImportEventsService {
       connectedAccount.id,
     );
 
+    const calendarId = await this.googleOAuth2ClientProvider.getImportCalendarId(
+      connectedAccount.id,
+    );
+
     const googleCalendarClient = google.calendar({
       version: 'v3',
       auth: oAuth2Client,
@@ -33,7 +37,7 @@ export class GoogleCalendarImportEventsService {
     const fetchedEvents = await Promise.all(
       eventExternalIds.map((eventExternalId) =>
         googleCalendarClient.events
-          .get({ calendarId: 'primary', eventId: eventExternalId })
+          .get({ calendarId, eventId: eventExternalId })
           .then((response) => response.data)
           .catch((error: GaxiosError) => {
             const status = error.response?.status;
